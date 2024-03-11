@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "nhan_vien-chuc_vu")
+@Entity(name = "nhan_vien_chuc_vu")
 public class NhanVienChucVu extends BaseEntity {
 
     @ManyToOne

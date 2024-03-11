@@ -29,7 +29,7 @@ public class HocKy extends BaseEntity {
     private TenHocKy ten;
 
     @Column(name = "nam")
-    private LocalDate nam;
+    private Long nam;
 
     @Column(name = "thoi_gian_bat_dau")
     private LocalDate thoiGianBatDau;
