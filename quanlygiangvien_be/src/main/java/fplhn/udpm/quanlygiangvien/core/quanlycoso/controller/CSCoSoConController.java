@@ -32,7 +32,7 @@ public class CSCoSoConController {
         return new ResponseEntity<>(csCoSoConService.addCoSoCon(csCreateCoSoConRequest), HttpStatus.OK);
     }
 
-    @PutMapping("/campus/{id}/update")
+    @PutMapping("/campus/{idCoSoCon}/update")
     public ResponseEntity<?> updateCoSoCon(@Valid @RequestBody CSCreateCoSoConRequest csCreateCoSoConRequest,@PathVariable Long idCoSoCon){
         return new ResponseEntity<>(csCoSoConService.updateCoSoCon(csCreateCoSoConRequest,idCoSoCon),HttpStatus.OK);
     }

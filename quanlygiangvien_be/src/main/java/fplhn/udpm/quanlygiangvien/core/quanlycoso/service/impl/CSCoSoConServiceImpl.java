@@ -75,11 +75,11 @@ public class CSCoSoConServiceImpl implements CSCoSoConService {
             return new ResponseModel(HttpStatus.NOT_ACCEPTABLE,"Tên Cơ sở con đã tồn tại");
         }
         Optional<CoSo> coSoOptional = csCoSoRepository.findById(csCreateCoSoConRequest.getIdCoSo());
-        if(coSoOptional.isPresent()){
+        if(!coSoOptional.isPresent()){
             return new ResponseModel(HttpStatus.NOT_ACCEPTABLE,"Cơ sở không tồn tại");
         }
         Optional<Campus> campusOptional = csCoSoConRepository.findById(csCreateCoSoConRequest.getIdCoSo());
-        if(campusOptional.isPresent()){
+        if(!campusOptional.isPresent()){
             return new ResponseModel(HttpStatus.NOT_ACCEPTABLE,"Cơ sở con không tồn tại");
         }
         Campus campus = new Campus();
@@ -88,7 +88,7 @@ public class CSCoSoConServiceImpl implements CSCoSoConService {
         campus.setCoSo(coSoOptional.get());
         campus.setId(idCoSoCon);
         csCoSoConRepository.save(campus);
-        return new ResponseModel(HttpStatus.CREATED,"Thêm thành công");
+        return new ResponseModel(HttpStatus.OK,"Sửa thành công");
     }
 
     @Override
@@ -104,4 +104,5 @@ public class CSCoSoConServiceImpl implements CSCoSoConService {
             return new ResponseModel(HttpStatus.NOT_ACCEPTABLE, "Cơ sở con không tồn tại");
         }
     }
+
 }

@@ -1,5 +1,6 @@
 package fplhn.udpm.quanlygiangvien.core.quanlycoso.service.impl;
 
+import fplhn.udpm.quanlygiangvien.core.common.ResponseModel;
 import fplhn.udpm.quanlygiangvien.core.quanlycoso.model.request.CSCreateCoSoRequest;
 import fplhn.udpm.quanlygiangvien.core.quanlycoso.repository.CSCoSoRepository;
 import fplhn.udpm.quanlygiangvien.entity.CoSo;
@@ -7,6 +8,7 @@ import fplhn.udpm.quanlygiangvien.infrastructure.constant.XoaMem;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -38,10 +41,14 @@ public class CSImportExcel {
                 Iterator<Cell> cellIterator = row.cellIterator();
                 while (cellIterator.hasNext()) {
                     Cell cell = cellIterator.next();
-                    CoSo csCreateCoSoRequest = new CoSo(cell.toString());
-                    csCreateCoSoRequest.setXoaMem(XoaMem.CHUA_XOA);
-                    csCoSoRepository.save(csCreateCoSoRequest);
-                    dataList.add(csCreateCoSoRequest);
+                    CoSo coSo = new CoSo();
+                    coSo.setTen(cell.toString());
+                    coSo.setXoaMem(XoaMem.CHUA_XOA);
+                    Boolean tonTai = csCoSoRepository.existsByTen(coSo.getTen());
+                    if(!tonTai){
+//                        csCoSoRepository.save(coSo);
+                        dataList.add(coSo);
+                    }
                 }
             }
             System.out.println(dataList);
@@ -51,6 +58,13 @@ public class CSImportExcel {
             ex.printStackTrace();
             return dataList;
         }
+    }
+
+    public ResponseModel saveImportExcel(List<CoSo> coSos){
+        for (CoSo coSo : coSos){
+            csCoSoRepository.save(coSo);
+        }
+        return new ResponseModel( HttpStatus.CREATED,"Import excel file thành công");
     }
 
 //    public String getStringCellValue(Cell cell) {
