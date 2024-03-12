@@ -33,6 +33,7 @@ public class CSCoSoController {
 
     @PostMapping
     public ResponseEntity<?> addCoSo(@Valid @RequestBody CSCreateCoSoRequest csCreateCoSoRequest){
+        System.out.println(csCreateCoSoRequest.getTenCoSo());
         return new ResponseEntity<>(csCoSoService.addCoSo(csCreateCoSoRequest),HttpStatus.OK);
     }
 
