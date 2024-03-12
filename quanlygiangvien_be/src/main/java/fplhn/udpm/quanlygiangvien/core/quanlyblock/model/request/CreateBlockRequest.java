@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BCreateBlockRequest {
+public class CreateBlockRequest {
 
     @NotNull(message = "Name cannot be empty")
     private String ten;
@@ -26,4 +26,5 @@ public class BCreateBlockRequest {
 
     @NotNull(message = "Hoc ky cannot be empty")
     private HocKy hocKy;
+
 }

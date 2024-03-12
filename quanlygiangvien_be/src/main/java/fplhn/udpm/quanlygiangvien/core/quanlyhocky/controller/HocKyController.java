@@ -1,50 +1,60 @@
 package fplhn.udpm.quanlygiangvien.core.quanlyhocky.controller;
 
-import fplhn.udpm.quanlygiangvien.core.quanlyhocky.service.impl.HocKyServiceImpl;
+import fplhn.udpm.quanlygiangvien.core.quanlyhocky.service.HocKyService;
 import fplhn.udpm.quanlygiangvien.entity.HocKy;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/hoc-ky")
+@CrossOrigin("*")
+@RequiredArgsConstructor
 public class HocKyController {
-    @Autowired
-    HocKyServiceImpl service;
+
+    private final HocKyService hocKyService;
+
+    private int PAGE_SIZE = 5;
+
     @GetMapping("/get-list/page={pageIndex}")
-    public Page<HocKy> getAll(@PathVariable("pageIndex")Optional<Integer> pageIndex) {
-        Pageable pageable = PageRequest.of(pageIndex.orElse(0), 5, Sort.by("id").descending());
-        return service.getPage(pageable);
+    public ResponseEntity<?> getAll(@PathVariable("pageIndex")Optional<Integer> pageIndex) {
+        Pageable pageable = PageRequest.of(pageIndex.orElse(0), PAGE_SIZE, Sort.by("id").descending());
+        return ResponseEntity.status(HttpStatus.OK).body(hocKyService.getPage(pageable));
     }
 
     @GetMapping(value = "get/{id}")
-    public Optional<HocKy> getById(@PathVariable("id") Long id) {
-        return service.getById(id);
+    public ResponseEntity<?> getById(@PathVariable("id") Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(hocKyService.getById(id));
     }
 
     @PostMapping(value = "/save")
-    public HocKy insert(@RequestBody HocKy newHocKy) {
-        return service.insert(newHocKy);
+    public ResponseEntity<?> insert(@RequestBody HocKy hocKy) {
+        return ResponseEntity.status(HttpStatus.OK).body(hocKyService.insert(hocKy));
     }
 
     @PutMapping(value = "/update/{id}")
-    public HocKy update(@PathVariable Long id, @RequestBody HocKy hocKyUpdated) {
-        HocKy hocKy = getById(id).get();
-        service.update(hocKy, hocKyUpdated);
-        return hocKy;
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody HocKy hocKyUpdated) {
+        HocKy hocKy = hocKyService.getById(id).get();
+        return ResponseEntity.status(HttpStatus.OK).body(hocKyService.update(hocKy, hocKyUpdated));
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> delete(@PathVariable Long id) {
-        service.delete(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(hocKyService.delete(id));
     }
+
 }
