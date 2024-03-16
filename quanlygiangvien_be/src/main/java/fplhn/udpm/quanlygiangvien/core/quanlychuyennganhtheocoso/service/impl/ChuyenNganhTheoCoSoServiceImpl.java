@@ -1,13 +1,13 @@
-package fplhn.udpm.quanlygiangvien.core.quanlychuyennganh.service.impl;
+package fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.service.impl;
 
 import fplhn.udpm.quanlygiangvien.core.common.ResponseModel;
 import fplhn.udpm.quanlygiangvien.core.quanlybomon.model.response.BoMonResponse;
 import fplhn.udpm.quanlygiangvien.core.quanlybomon.repository.DataBoMonRepository;
-import fplhn.udpm.quanlygiangvien.core.quanlychuyennganh.model.request.GetChuyenNganhRequest;
-import fplhn.udpm.quanlygiangvien.core.quanlychuyennganh.model.request.PostChuyenNganhRequest;
-import fplhn.udpm.quanlygiangvien.core.quanlychuyennganh.model.response.ChuyenNganhResponse;
-import fplhn.udpm.quanlygiangvien.core.quanlychuyennganh.repository.DataChuyenNganhRepository;
-import fplhn.udpm.quanlygiangvien.core.quanlychuyennganh.service.ChuyenNganhService;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.request.GetChuyenNganhRequest;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.repository.DataChuyenNganhRepository;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.request.PostChuyenNganhRequest;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.response.ChuyenNganhResponse;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.service.ChuyenNganhService;
 import fplhn.udpm.quanlygiangvien.entity.BoMon;
 import fplhn.udpm.quanlygiangvien.entity.ChuyenNganh;
 import fplhn.udpm.quanlygiangvien.infrastructure.constant.XoaMem;
@@ -57,9 +57,10 @@ public class ChuyenNganhServiceImpl implements ChuyenNganhService {
 
         Page<ChuyenNganhResponse> pages = dataChuyenNganhRepository.getAllChuyenNganh(idBoMon, startItem, pageable, searchName);
 
-        if (pages.getContent().isEmpty() && pages.getTotalPages() > 0 && pages.getTotalPages() < page) {
-            dataRequest.setPage(Math.max(pages.getTotalPages(), 1));
-            return this.getAllList(idBoMon, dataRequest);
+        if (pages.getContent().isEmpty() && pages.getTotalPages() < page) {
+            page = Math.max(pages.getTotalPages(), 1);
+            startItem = (long) pages.getPageable().getPageNumber() * pages.getPageable().getPageSize();
+            pages = dataChuyenNganhRepository.getAllChuyenNganh(idBoMon, startItem, PageRequest.of(page - 1, limit), searchName);
         }
 
         return new PageImpl<>(

@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -55,7 +56,7 @@ public class BoMonServiceImpl implements BoMonService {
 
         Page<BoMonResponse> pages = dataBoMonRepository.getAllBoMon(startItem, pageable, searchName);
 
-        if (pages.getContent().isEmpty() && pages.getTotalPages() < page) {
+        if (pages.getContent().isEmpty() && pages.getTotalPages() > 0 && pages.getTotalPages() < page) {
             dataRequest.setPage(Math.max(pages.getTotalPages(), 1));
             return this.getAllList(dataRequest);
         }
