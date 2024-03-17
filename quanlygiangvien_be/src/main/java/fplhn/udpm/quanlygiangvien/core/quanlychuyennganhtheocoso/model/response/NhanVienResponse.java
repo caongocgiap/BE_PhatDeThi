@@ -1,17 +1,12 @@
 package fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.response;
 
-import fplhn.udpm.quanlygiangvien.infrastructure.constant.XoaMem;
-
-public interface BoMonTheoCoSoResponse {
+public interface NhanVienResponse {
 
     Long getId();
 
+    String getTen();
+
+    String getMaNhanVien();
+
     Long getIdBoMon();
-
-    Long getIdCoSo();
-
-    String getTenCoSo();
-
-    XoaMem getTrangThai();
-
 }

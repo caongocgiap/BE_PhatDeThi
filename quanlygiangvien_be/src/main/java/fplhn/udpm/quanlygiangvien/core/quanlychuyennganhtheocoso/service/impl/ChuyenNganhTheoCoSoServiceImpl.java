@@ -1,15 +1,19 @@
 package fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.service.impl;
 
 import fplhn.udpm.quanlygiangvien.core.common.ResponseModel;
-import fplhn.udpm.quanlygiangvien.core.quanlybomon.model.response.BoMonResponse;
-import fplhn.udpm.quanlygiangvien.core.quanlybomon.repository.DataBoMonRepository;
-import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.request.GetChuyenNganhRequest;
-import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.repository.DataChuyenNganhRepository;
-import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.request.PostChuyenNganhRequest;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.request.GetChuyenNganhTheoCoSoRequest;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.request.PutChuyenNganhTheoCoSoRequest;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.response.BoMonTheoCoSoResponse;
 import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.response.ChuyenNganhResponse;
-import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.service.ChuyenNganhService;
-import fplhn.udpm.quanlygiangvien.entity.BoMon;
-import fplhn.udpm.quanlygiangvien.entity.ChuyenNganh;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.response.NhanVienResponse;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.repository.DataBoMonTheoCoSoRepository;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.repository.DataChuyenNganhRepository;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.repository.DataChuyenNganhTheoCoSoRepository;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.request.PostChuyenNganhTheoCoSoRequest;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.response.ChuyenNganhTheoCoSoResponse;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.repository.DataNhanVienRepository;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.service.ChuyenNganhTheoCoSoService;
+import fplhn.udpm.quanlygiangvien.entity.*;
 import fplhn.udpm.quanlygiangvien.infrastructure.constant.XoaMem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,27 +24,32 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Optional;;
 
 
 @Service
-public class ChuyenNganhServiceImpl implements ChuyenNganhService {
+public class ChuyenNganhTheoCoSoServiceImpl implements ChuyenNganhTheoCoSoService {
+
+    @Autowired
+    private DataChuyenNganhTheoCoSoRepository dataChuyenNganhTheoCoSoRepository;
+
+    @Autowired
+    private DataBoMonTheoCoSoRepository dataBoMonTheoCoSoRepository;
 
     @Autowired
     private DataChuyenNganhRepository dataChuyenNganhRepository;
 
     @Autowired
-    private DataBoMonRepository dataBoMonRepository;
+    private DataNhanVienRepository dataNhanVienRepository;
 
     @Override
-    public ChuyenNganhResponse getChuyenNganh(Long id) {
-        Optional<ChuyenNganhResponse> currentChuyenNganh = dataChuyenNganhRepository.getChuyenNganhById(id);
+    public ChuyenNganhTheoCoSoResponse getChuyenNganhTheoCoSo(Long id) {
+        Optional<ChuyenNganhTheoCoSoResponse> currentChuyenNganh = dataChuyenNganhTheoCoSoRepository.getChuyenNganhTheoCoSoById(id);
         return currentChuyenNganh.orElse(null);
     }
 
     @Override
-    public Page<ChuyenNganhResponse> getAllList(Long idBoMon, GetChuyenNganhRequest dataRequest) {
+    public Page<ChuyenNganhTheoCoSoResponse> getAllList(GetChuyenNganhTheoCoSoRequest dataRequest) {
         int page = Math.max(dataRequest.getPage(), 1);
         int limit = dataRequest.getLimit();
 
@@ -48,19 +57,11 @@ public class ChuyenNganhServiceImpl implements ChuyenNganhService {
 
         long startItem = (long) pageable.getPageNumber() * pageable.getPageSize();
 
-        String searchName = null;
-        if (dataRequest.getSearchName() != null) {
-            searchName = dataRequest.getSearchName().stream()
-                    .map(name -> name.replaceAll("[\\\\.*+?\\[\\](){|^$]", "\\\\$0"))
-                    .collect(Collectors.joining("|"));
-        }
+        Page<ChuyenNganhTheoCoSoResponse> pages = dataChuyenNganhTheoCoSoRepository.getAllChuyenNganh(dataRequest, startItem, pageable);
 
-        Page<ChuyenNganhResponse> pages = dataChuyenNganhRepository.getAllChuyenNganh(idBoMon, startItem, pageable, searchName);
-
-        if (pages.getContent().isEmpty() && pages.getTotalPages() < page) {
-            page = Math.max(pages.getTotalPages(), 1);
-            startItem = (long) pages.getPageable().getPageNumber() * pages.getPageable().getPageSize();
-            pages = dataChuyenNganhRepository.getAllChuyenNganh(idBoMon, startItem, PageRequest.of(page - 1, limit), searchName);
+        if (pages.getContent().isEmpty() && pages.getTotalPages() > 0 && pages.getTotalPages() < page) {
+            dataRequest.setPage(Math.max(pages.getTotalPages(), 1));
+            return this.getAllList(dataRequest);
         }
 
         return new PageImpl<>(
@@ -71,113 +72,159 @@ public class ChuyenNganhServiceImpl implements ChuyenNganhService {
     }
 
     @Override
-    public ResponseModel addChuyenNganh(PostChuyenNganhRequest dataRequest) {
+    public ResponseModel addChuyenNganhTheoCoSo(PostChuyenNganhTheoCoSoRequest dataRequest) {
 
-        String ten = dataRequest.getTen().trim().replaceAll("\\s+", " ");
+        Optional<BoMonTheoCoSoResponse> boMonTheoCoSoResponse = dataBoMonTheoCoSoRepository.getBoMonTheoCoSoById(dataRequest.getIdBoMonTheoCoSo());
 
-        if (ten.isEmpty()) {
-            return new ResponseModel(HttpStatus.BAD_GATEWAY, "Tên chuyên ngành không được bỏ trống");
+        if (boMonTheoCoSoResponse.isEmpty()) {
+            return new ResponseModel(HttpStatus.BAD_GATEWAY, "Bộ môn theo cơ sở không tồn tại hoặc đã bị xoá");
         }
 
-        Optional<BoMonResponse> boMonResponse = dataBoMonRepository.getBoMonById(dataRequest.getIdBoMon());
+        Optional<ChuyenNganhResponse> chuyenNganhResponse = dataChuyenNganhRepository.getChuyenNganhByIdAndIdBoMon(dataRequest.getIdChuyenNganh(), boMonTheoCoSoResponse.get().getIdBoMon());
 
-        if (boMonResponse.isEmpty()) {
-            return new ResponseModel(HttpStatus.BAD_GATEWAY, "Bộ môn không tồn tại hoặc đã bị xoá");
+        if (chuyenNganhResponse.isEmpty()) {
+            return new ResponseModel(HttpStatus.BAD_GATEWAY, "Chuyên ngành không tồn tại trong bộ môn hoặc đã bị xoá");
         }
 
-        if (dataChuyenNganhRepository.existsByTen(dataRequest.getIdBoMon(), ten)) {
-            return new ResponseModel(HttpStatus.BAD_GATEWAY, "Tên chuyên ngành đã tồn tại trên hệ thống");
+        if (dataChuyenNganhTheoCoSoRepository.existsChuyenNganhTheoCoSo(dataRequest.getIdBoMonTheoCoSo(), dataRequest.getIdChuyenNganh())) {
+            return new ResponseModel(HttpStatus.BAD_GATEWAY, "Chuyên ngành đã tồn tại trong bộ môn của cơ sở này");
         }
 
-        BoMon boMon = new BoMon();
-        boMon.setId(dataRequest.getIdBoMon());
+        NhanVien truongMon = null;
+
+        if (dataRequest.getIdTruongMon() != null && dataRequest.getIdTruongMon() > 0) {
+            Optional<NhanVienResponse> nhanVienResponse = dataNhanVienRepository.getNhanVienByIdAndIdBoMonCoSo(dataRequest.getIdTruongMon(), dataRequest.getIdBoMonTheoCoSo());
+
+            if (nhanVienResponse.isEmpty()) {
+                return new ResponseModel(HttpStatus.BAD_GATEWAY, "Nhân viên không tồn tại hoặc không thuộc bộ môn của cơ sở này");
+            }
+
+            truongMon = new NhanVien();
+            truongMon.setId(nhanVienResponse.get().getId());
+        }
+
+        BoMonTheoCoSo boMonTheoCoSo = new BoMonTheoCoSo();
+        boMonTheoCoSo.setId(dataRequest.getIdBoMonTheoCoSo());
 
         ChuyenNganh chuyenNganh = new ChuyenNganh();
-        chuyenNganh.setTen(ten);
-        chuyenNganh.setBoMon(boMon);
-        chuyenNganh.setXoaMem(boMonResponse.get().getTrangThai());
+        chuyenNganh.setId(dataRequest.getIdChuyenNganh());
+
+        ChuyenNganhTheoCoSo chuyenNganhTheoCoSo = new ChuyenNganhTheoCoSo();
+        chuyenNganhTheoCoSo.setBoMonTheoCoSo(boMonTheoCoSo);
+        chuyenNganhTheoCoSo.setChuyenNganh(chuyenNganh);
+        chuyenNganhTheoCoSo.setNhanVien(truongMon);
+        chuyenNganhTheoCoSo.setXoaMem(XoaMem.CHUA_XOA);
 
         try {
-            dataChuyenNganhRepository.save(chuyenNganh);
+            dataChuyenNganhTheoCoSoRepository.save(chuyenNganhTheoCoSo);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseModel(HttpStatus.BAD_GATEWAY, "Có lỗi xảy ra. Vui lòng thử lại");
         }
 
-        return new ResponseModel(HttpStatus.OK, "Thêm mới thành công chuyên ngành: " + ten);
+        return new ResponseModel(HttpStatus.OK, "Thêm mới thành công chuyên ngành theo cơ sở.");
     }
 
     @Override
-    public ResponseModel updateChuyenNganh(Long id, PostChuyenNganhRequest dataRequest) {
-        Optional<ChuyenNganhResponse> currentChuyenNganh = dataChuyenNganhRepository.getChuyenNganhById(id);
-        String ten = dataRequest.getTen().trim().replaceAll("\\s+", " ");
+    public ResponseModel updateChuyenNganhTheoCoSo(Long id, PutChuyenNganhTheoCoSoRequest dataRequest) {
+        Optional<ChuyenNganhTheoCoSoResponse> currentChuyenNganhTheoCoSo = dataChuyenNganhTheoCoSoRepository.getChuyenNganhTheoCoSoById(id);
 
-        if (currentChuyenNganh.isEmpty()) {
-            return new ResponseModel(HttpStatus.BAD_GATEWAY, "Chuyên ngành không tồn tại hoặc đã bị xoá");
+        if (currentChuyenNganhTheoCoSo.isEmpty()) {
+            return new ResponseModel(HttpStatus.BAD_GATEWAY, "Chuyên ngành theo cơ sở không tồn tại hoặc đã bị xoá");
         }
 
-        if (ten.isEmpty()) {
-            return new ResponseModel(HttpStatus.BAD_GATEWAY, "Tên chuyên ngành không được bỏ trống");
+        Optional<BoMonTheoCoSoResponse> boMonTheoCoSoResponse = dataBoMonTheoCoSoRepository.getBoMonTheoCoSoById(dataRequest.getIdBoMonTheoCoSo());
+
+        if (boMonTheoCoSoResponse.isEmpty()) {
+            return new ResponseModel(HttpStatus.BAD_GATEWAY, "Bộ môn theo cơ sở không tồn tại hoặc đã bị xoá");
         }
 
-        if (dataChuyenNganhRepository.existsByTenWidthOutId(id, ten)) {
-            return new ResponseModel(HttpStatus.BAD_GATEWAY, "Tên chuyên ngành đã tồn tại trên hệ thống");
+        Optional<ChuyenNganhResponse> chuyenNganhResponse = dataChuyenNganhRepository.getChuyenNganhByIdAndIdBoMon(dataRequest.getIdChuyenNganh(), boMonTheoCoSoResponse.get().getIdBoMon());
+
+        if (chuyenNganhResponse.isEmpty()) {
+            return new ResponseModel(HttpStatus.BAD_GATEWAY, "Chuyên ngành không tồn tại trong bộ môn hoặc đã bị xoá");
         }
 
-        BoMon boMon = new BoMon();
-        boMon.setId(currentChuyenNganh.get().getIdBoMon());
+        NhanVien truongMon = null;
+
+        if (dataRequest.getIdTruongMon() != null && dataRequest.getIdTruongMon() > 0) {
+            Optional<NhanVienResponse> nhanVienResponse = dataNhanVienRepository.getNhanVienByIdAndIdBoMonCoSo(dataRequest.getIdTruongMon(), dataRequest.getIdBoMonTheoCoSo());
+
+            if (nhanVienResponse.isEmpty()) {
+                return new ResponseModel(HttpStatus.BAD_GATEWAY, "Nhân viên không tồn tại hoặc không thuộc bộ môn của cơ sở này");
+            }
+
+            truongMon = new NhanVien();
+            truongMon.setId(nhanVienResponse.get().getId());
+        }
+
+
+        if (dataChuyenNganhTheoCoSoRepository.existsChuyenNganhTheoCoSoWidthOutId(id, dataRequest.getIdBoMonTheoCoSo(), dataRequest.getIdChuyenNganh())) {
+            return new ResponseModel(HttpStatus.BAD_GATEWAY, "Chuyên ngành đã tồn tại trong bộ môn của cơ sở này");
+        }
+
+        BoMonTheoCoSo boMonTheoCoSo = new BoMonTheoCoSo();
+        boMonTheoCoSo.setId(boMonTheoCoSoResponse.get().getId());
 
         ChuyenNganh chuyenNganh = new ChuyenNganh();
-        chuyenNganh.setId(id);
-        chuyenNganh.setTen(ten);
-        chuyenNganh.setBoMon(boMon);
-        chuyenNganh.setXoaMem(currentChuyenNganh.get().getTrangThai());
+        chuyenNganh.setId(chuyenNganhResponse.get().getId());
+
+
+        ChuyenNganhTheoCoSo chuyenNganhTheoCoSo = new ChuyenNganhTheoCoSo();
+        chuyenNganhTheoCoSo.setId(id);
+        chuyenNganhTheoCoSo.setChuyenNganh(chuyenNganh);
+        chuyenNganhTheoCoSo.setBoMonTheoCoSo(boMonTheoCoSo);
+        chuyenNganhTheoCoSo.setNhanVien(truongMon);
+        chuyenNganhTheoCoSo.setXoaMem(currentChuyenNganhTheoCoSo.get().getTrangThai());
 
         try {
-            dataChuyenNganhRepository.save(chuyenNganh);
+            dataChuyenNganhTheoCoSoRepository.save(chuyenNganhTheoCoSo);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseModel(HttpStatus.BAD_GATEWAY, "Có lỗi xảy ra. Vui lòng thử lại");
         }
-        return new ResponseModel(HttpStatus.OK, "Cập nhật chuyên ngành thành công");
+        return new ResponseModel(HttpStatus.OK, "Cập nhật chuyên ngành theo cơ sở thành công");
     }
 
     @Override
-    public ResponseModel deleteChuyenNganh(Long id) {
+    public ResponseModel deleteChuyenNganhTheoCoSo(Long id) {
 
-        Optional<ChuyenNganhResponse> currentChuyenNganh = dataChuyenNganhRepository.getChuyenNganhById(id);
+        Optional<ChuyenNganhTheoCoSoResponse> currentChuyenNganhTheoCoSo = dataChuyenNganhTheoCoSoRepository.getChuyenNganhTheoCoSoById(id);
 
-        if (currentChuyenNganh.isEmpty()) {
-            return new ResponseModel(HttpStatus.BAD_GATEWAY, "Chuyên ngành không tồn tại hoặc đã bị xoá");
+        if (currentChuyenNganhTheoCoSo.isEmpty()) {
+            return new ResponseModel(HttpStatus.BAD_GATEWAY, "Chuyên ngành theo cơ sở không tồn tại hoặc đã bị xoá");
         }
 
-        BoMon boMon = new BoMon();
-        boMon.setId(currentChuyenNganh.get().getIdBoMon());
+        BoMonTheoCoSo boMonTheoCoSo = new BoMonTheoCoSo();
+        boMonTheoCoSo.setId(currentChuyenNganhTheoCoSo.get().getIdBoMonTheoCoSo());
 
         ChuyenNganh chuyenNganh = new ChuyenNganh();
-        chuyenNganh.setId(currentChuyenNganh.get().getId());
-        chuyenNganh.setTen(currentChuyenNganh.get().getTen());
-        chuyenNganh.setBoMon(boMon);
-        chuyenNganh.setXoaMem(XoaMem.DA_XOA);
+        chuyenNganh.setId(currentChuyenNganhTheoCoSo.get().getIdChuyenNganh());
 
-        if (currentChuyenNganh.get().getTrangThai().equals(XoaMem.CHUA_XOA)) {
+        ChuyenNganhTheoCoSo chuyenNganhTheoCoSo = new ChuyenNganhTheoCoSo();
+        chuyenNganhTheoCoSo.setId(currentChuyenNganhTheoCoSo.get().getId());
+        chuyenNganhTheoCoSo.setBoMonTheoCoSo(boMonTheoCoSo);
+        chuyenNganhTheoCoSo.setChuyenNganh(chuyenNganh);
+        chuyenNganhTheoCoSo.setXoaMem(XoaMem.DA_XOA);
+
+        if (currentChuyenNganhTheoCoSo.get().getTrangThai().equals(XoaMem.CHUA_XOA)) {
             try {
-                dataChuyenNganhRepository.save(chuyenNganh);
+                dataChuyenNganhTheoCoSoRepository.save(chuyenNganhTheoCoSo);
             } catch (Exception e) {
                 e.printStackTrace();
                 return new ResponseModel(HttpStatus.BAD_GATEWAY, "Có lỗi xảy ra. Vui lòng thử lại");
             }
-            return new ResponseModel(HttpStatus.OK, "Cập nhật thành công chuyên ngành: " + currentChuyenNganh.get().getTen());
+            return new ResponseModel(HttpStatus.OK, "Cập nhật thành công chuyên ngành theo cơ sở: " + currentChuyenNganhTheoCoSo.get().getTenChuyenNganh());
         }
 
         try {
-            dataChuyenNganhRepository.delete(chuyenNganh);
+            dataChuyenNganhTheoCoSoRepository.delete(chuyenNganhTheoCoSo);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseModel(HttpStatus.BAD_GATEWAY, "Có lỗi xảy ra. Vui lòng thử lại");
         }
 
-        return new ResponseModel(HttpStatus.OK, "Xoá thành công chuyên ngành: " + currentChuyenNganh.get().getTen());
+        return new ResponseModel(HttpStatus.OK, "Xoá thành công chuyên ngành theo cơ sở: " + currentChuyenNganhTheoCoSo.get().getTenChuyenNganh());
     }
 
 }

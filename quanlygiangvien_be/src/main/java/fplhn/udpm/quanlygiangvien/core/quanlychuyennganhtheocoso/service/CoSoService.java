@@ -1,23 +1,11 @@
 package fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.service;
 
-import fplhn.udpm.quanlygiangvien.core.common.ResponseModel;
-import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.request.GetChuyenNganhTheoCoSoRequest;
-import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.request.PutChuyenNganhTheoCoSoRequest;
-import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.response.ChuyenNganhTheoCoSoResponse;
-import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.request.PostChuyenNganhTheoCoSoRequest;
-import org.springframework.data.domain.Page;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.response.CoSoResponse;
 
-public interface ChuyenNganhTheoCoSoService {
+import java.util.List;
 
-    ChuyenNganhTheoCoSoResponse getChuyenNganhTheoCoSo(Long id);
+public interface CoSoService {
 
-    Page<ChuyenNganhTheoCoSoResponse> getAllList(GetChuyenNganhTheoCoSoRequest dataRequest);
-
-    ResponseModel addChuyenNganhTheoCoSo(PostChuyenNganhTheoCoSoRequest dataRequest);
-
-    ResponseModel updateChuyenNganhTheoCoSo(Long id, PutChuyenNganhTheoCoSoRequest dataRequest);
-
-    ResponseModel deleteChuyenNganhTheoCoSo(Long id);
-
+    List<CoSoResponse> getAllList();
 
 }

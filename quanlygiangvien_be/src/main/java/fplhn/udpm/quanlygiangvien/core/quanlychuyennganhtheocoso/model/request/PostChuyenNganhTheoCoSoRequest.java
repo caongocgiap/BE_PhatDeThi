@@ -11,12 +11,14 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-public class PostChuyenNganhRequest {
+public class PostChuyenNganhTheoCoSoRequest {
 
-    @Size(max = 255, message = "Tên bộ môn không được vượt quá 255 ký tự")
-    @NotNull(message = "Tên bộ môn không được bỏ trống")
-    private String ten;
+    @NotNull(message = "Bộ môn theo cơ sở không được bỏ trống")
+    private Long idBoMonTheoCoSo;
 
-    private Long idBoMon;
+    @NotNull(message = "Chuyên ngành không được bỏ trống")
+    private Long idChuyenNganh;
+
+    private Long idTruongMon;
 
 }

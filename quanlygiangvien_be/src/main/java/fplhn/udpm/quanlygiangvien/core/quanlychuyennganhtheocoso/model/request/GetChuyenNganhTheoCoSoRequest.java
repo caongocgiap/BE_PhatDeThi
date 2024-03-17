@@ -11,9 +11,15 @@ import java.util.List;
 @NoArgsConstructor
 @Setter
 @Getter
-public class GetChuyenNganhRequest {
+public class GetChuyenNganhTheoCoSoRequest {
 
-    private List<String> searchName;
+    private String tenChuyenNganh;
+
+    private Long idBoMon;
+
+    private Long idCoSo;
+
+    private String tinhTrang;
 
     private int page = 1;
 

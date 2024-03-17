@@ -1,11 +1,7 @@
 package fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.repository;
 
-import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.response.BoMonTheoCoSoResponse;
-import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.response.ChuyenNganhTheoCoSoResponse;
-import fplhn.udpm.quanlygiangvien.repository.BoMonTheoCoSoRepository;
-import fplhn.udpm.quanlygiangvien.repository.ChuyenNganhRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.response.NhanVienResponse;
+import fplhn.udpm.quanlygiangvien.repository.NhanVienRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -13,20 +9,35 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
-public interface DataBoMonTheoCoSoRepository extends BoMonTheoCoSoRepository {
+@Repository("quanLyChuyenNganhTheoCoSo_data_nhanVien")
+public interface DataNhanVienRepository extends NhanVienRepository {
 
     @Query(value = """
             SELECT 
-                bmtcs.id AS id,
-                bmtcs.id_bo_mon AS idBoMon,
-                bmtcs.id_co_so AS idCoSo,
-                cs.ten AS tenCoSo,
-                bmtcs.xoa_mem AS trangThai
-            FROM bo_mon_theo_co_so AS bmtcs
-            LEFT JOIN co_so AS cs ON bmtcs.id_co_so = cs.id
-            WHERE bmtcs.id = :id
+                nv.id,
+                nv.ten,
+                nv.ma_nhan_vien AS maNhanVien,
+                bmtcs.id_bo_mon AS idBoMon
+            FROM nhan_vien AS nv
+            LEFT JOIN bo_mon_theo_co_so AS bmtcs ON bmtcs.id = nv.id_bo_mon_theo_co_so
+            WHERE 
+                nv.id = :idNhanVien AND
+                nv.id_bo_mon_theo_co_so = :idBoMonTheoCoSo
             """,
             nativeQuery = true)
-    Optional<BoMonTheoCoSoResponse> getBoMonTheoCoSoById(@Param("id") Long id);
+    Optional<NhanVienResponse> getNhanVienByIdAndIdBoMonCoSo(@Param("idNhanVien") Long idNhanVien, @Param("idBoMonTheoCoSo") Long idBoMonTheoCoSo);
+
+    @Query(value = """
+            SELECT 
+                nv.id,
+                nv.ten,
+                nv.ma_nhan_vien AS maNhanVien,
+                bmtcs.id_bo_mon AS idBoMon
+            FROM nhan_vien AS nv
+            LEFT JOIN bo_mon_theo_co_so AS bmtcs ON bmtcs.id = nv.id_bo_mon_theo_co_so
+            WHERE 
+                nv.xoa_mem = :#{T(fplhn.udpm.quanlygiangvien.infrastructure.constant.XoaMem).CHUA_XOA.name()}
+            """,
+            nativeQuery = true)
+    List<NhanVienResponse> getAllNhanVien();
 }

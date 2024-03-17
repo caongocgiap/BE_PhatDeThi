@@ -1,6 +1,6 @@
 package fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.response;
 
-public interface CoSoResponse {
+public interface BoMonResponse {
 
     Long getId();
 

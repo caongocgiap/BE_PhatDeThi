@@ -1,12 +1,10 @@
-package fplhn.udpm.quanlygiangvien.core.quanlychuyennganh.model.response;
+package fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.response;
 
 import fplhn.udpm.quanlygiangvien.infrastructure.constant.XoaMem;
 
 public interface ChuyenNganhResponse {
 
     Long getId();
-
-    Long getStt();
 
     String getTen();
 

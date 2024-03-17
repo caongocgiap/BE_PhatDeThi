@@ -1,7 +1,9 @@
 package fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.repository;
 
-import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.response.ChuyenNganhResponse;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.request.GetChuyenNganhTheoCoSoRequest;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.response.ChuyenNganhTheoCoSoResponse;
 import fplhn.udpm.quanlygiangvien.repository.ChuyenNganhRepository;
+import fplhn.udpm.quanlygiangvien.repository.ChuyenNganhTheoCoSoRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
@@ -10,49 +12,56 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface DataChuyenNganhRepository extends ChuyenNganhRepository {
+public interface DataChuyenNganhTheoCoSoRepository extends ChuyenNganhTheoCoSoRepository {
 
     @Query(value = """
             SELECT 
                 @row_number \\:= @row_number + 1 AS stt,
-                cn.id AS id,
-                cn.id_bo_mon AS idBoMon,
-                cn.ten AS ten,
-                cn.xoa_mem AS trangThai
+                cntcs.id AS id,
+                cntcs.id_bo_mon_theo_co_so AS idBoMonTheoCoSo,
+                bm.id AS idBoMon,
+                bm.ten AS tenBoMon,
+                cntcs.id_chuyen_nganh AS idChuyenNganh,
+                cn.ten AS tenChuyenNganh,
+                cs.id AS idCoSo,
+                cs.ten AS tenCoSo,
+                cntcs.id_truong_mon AS idTruongMon,
+                nv.ten AS tenTruongMon,
+                cntcs.xoa_mem AS trangThai
             FROM 
                 (SELECT @row_number \\:= :startItem) AS init,
-                chuyen_nganh AS cn
+                chuyen_nganh_theo_co_so AS cntcs
+            LEFT JOIN bo_mon_theo_co_so AS bmtcs ON bmtcs.id = cntcs.id_bo_mon_theo_co_so
+            LEFT JOIN bo_mon AS bm ON bmtcs.id_bo_mon = bm.id
+            LEFT JOIN co_so AS cs ON cs.id = bmtcs.id_co_so
+            LEFT JOIN chuyen_nganh AS cn ON cn.id = cntcs.id_chuyen_nganh
+            LEFT JOIN nhan_vien AS nv ON nv.id = cntcs.id_truong_mon
             WHERE
-                id_bo_mon = :id
-                AND
-                (
-                    :searchName IS NULL
-                    OR
-                    cn.ten REGEXP :searchName
-                )
-            ORDER BY cn.id DESC
+                (:#{#dataRequest.tenChuyenNganh} IS NULL OR LOWER(cn.ten) LIKE LOWER(CONCAT('%', :#{#dataRequest.tenChuyenNganh}, '%'))) AND
+                (COALESCE(:#{#dataRequest.idBoMon}, 0) = 0 OR bmtcs.id_bo_mon = :#{#dataRequest.idBoMon}) AND
+                (COALESCE(:#{#dataRequest.idCoSo}, 0) = 0 OR bmtcs.id_co_so = :#{#dataRequest.idCoSo}) AND
+                (COALESCE(:#{#dataRequest.tinhTrang}, 0) = 0 OR cntcs.xoa_mem = :#{#dataRequest.tinhTrang})
+            ORDER BY cntcs.id DESC
             """,
             countQuery = """
             SELECT COUNT(*) 
-            FROM chuyen_nganh 
+            FROM chuyen_nganh_theo_co_so AS cntcs 
+            LEFT JOIN bo_mon_theo_co_so AS bmtcs ON bmtcs.id = cntcs.id_bo_mon_theo_co_so
             WHERE
-                id_bo_mon = :id
-                AND
-                (
-                    :searchName IS NULL
-                    OR
-                    ten REGEXP :searchName
-                )
+                (:#{#dataRequest.tenChuyenNganh} IS NULL OR LOWER(cn.ten) LIKE LOWER(CONCAT('%', :#{#dataRequest.tenChuyenNganh}, '%'))) AND
+                (COALESCE(:#{#dataRequest.idBoMon}, 0) = 0 OR bmtcs.id_bo_mon = :#{#dataRequest.idBoMon}) AND
+                (COALESCE(:#{#dataRequest.idCoSo}, 0) = 0 OR bmtcs.id_co_so = :#{#dataRequest.idCoSo}) AND
+                (COALESCE(:#{#dataRequest.tinhTrang}, 0) = 0 OR cntcs.xoa_mem = :#{#dataRequest.tinhTrang})
             """,
             nativeQuery = true)
-    Page<ChuyenNganhResponse> getAllChuyenNganh(
-            @Param("id") Long idBoMon,
+    Page<ChuyenNganhTheoCoSoResponse> getAllChuyenNganh(
+            @Param("dataRequest") GetChuyenNganhTheoCoSoRequest dataRequest,
             @Param("startItem") Long startItem,
-            Pageable pageable,
-            @Param("searchName") String searchName
+            Pageable pageable
     );
 
     @Query(value = """
@@ -62,10 +71,12 @@ public interface DataChuyenNganhRepository extends ChuyenNganhRepository {
                 THEN \\"true\\"
                 ELSE \\"false\\"
             END
-        FROM chuyen_nganh 
-        WHERE id_bo_mon = :id AND LOWER(ten) LIKE LOWER(:ten)            
+        FROM chuyen_nganh_theo_co_so 
+        WHERE 
+            id_bo_mon_theo_co_so = :idBoMonTheoCoSo AND 
+            id_chuyen_nganh = :idChuyenNganh           
         """, nativeQuery = true)
-    boolean existsByTen(@Param("id") Long idBoMon, @Param("ten") String name);
+    boolean existsChuyenNganhTheoCoSo(@Param("idBoMonTheoCoSo") Long idBoMonTheoCoSo, @Param("idChuyenNganh") Long idChuyenNganh);
 
     @Query(value = """
         SELECT 
@@ -74,41 +85,37 @@ public interface DataChuyenNganhRepository extends ChuyenNganhRepository {
                 THEN \\"true\\"
                 ELSE \\"false\\"
             END
-        FROM chuyen_nganh 
-        WHERE id != :id AND LOWER(ten) LIKE LOWER(:ten)            
+        FROM chuyen_nganh_theo_co_so
+        WHERE 
+            id != :id AND
+            id_bo_mon_theo_co_so = :idBoMonTheoCoSo AND 
+            id_chuyen_nganh = :idChuyenNganh             
         """, nativeQuery = true)
-    boolean existsByTenWidthOutId(@Param("id") Long id, @Param("ten") String name);
+    boolean existsChuyenNganhTheoCoSoWidthOutId(@Param("id") Long id, @Param("idBoMonTheoCoSo") Long idBoMonTheoCoSo, @Param("idChuyenNganh") Long idChuyenNganh);
 
     @Query(value = """
             SELECT 
                 0 AS stt,
-                cn.id AS id,
-                cn.id_bo_mon AS idBoMon,
-                cn.ten AS ten,
-                cn.xoa_mem AS trangThai
-            FROM chuyen_nganh AS cn
-            WHERE cn.id = :id
+                cntcs.id AS id,
+                cntcs.id_bo_mon_theo_co_so AS idBoMonTheoCoSo,
+                bm.id AS idBoMon,
+                bm.ten AS tenBoMon,
+                cntcs.id_chuyen_nganh AS idChuyenNganh,
+                cn.ten AS tenChuyenNganh,
+                cs.id AS idCoSo,
+                cs.ten AS tenCoSo,
+                cntcs.id_truong_mon AS idTruongMon,
+                nv.ten AS tenTruongMon,
+                cntcs.xoa_mem AS trangThai
+            FROM chuyen_nganh_theo_co_so AS cntcs
+            LEFT JOIN bo_mon_theo_co_so AS bmtcs ON bmtcs.id = cntcs.id_bo_mon_theo_co_so
+            LEFT JOIN bo_mon AS bm ON bm.id = bmtcs.id_bo_mon
+            LEFT JOIN co_so AS cs ON cs.id = bmtcs.id_co_so
+            LEFT JOIN chuyen_nganh AS cn ON cn.id = cntcs.id_chuyen_nganh
+            LEFT JOIN nhan_vien AS nv ON nv.id = cntcs.id_truong_mon
+            WHERE cntcs.id = :id
             """,
             nativeQuery = true)
-    Optional<ChuyenNganhResponse> getChuyenNganhById(@Param("id") Long id);
+    Optional<ChuyenNganhTheoCoSoResponse> getChuyenNganhTheoCoSoById(@Param("id") Long id);
 
-    @Transactional
-    @Modifying
-    @Query(value = """
-            UPDATE chuyen_nganh 
-            SET xoa_mem = :#{T(fplhn.udpm.quanlygiangvien.infrastructure.constant.XoaMem).DA_XOA.name()}
-            WHERE id_bo_mon = :id
-            """,
-            nativeQuery = true)
-    void updateXoaMemAllChuyenNganhByIdBoMon(@Param("id") Long id);
-
-    @Transactional
-    @Modifying
-    @Query(value = """
-            DELETE 
-            FROM chuyen_nganh 
-            WHERE id_bo_mon = :id
-            """,
-            nativeQuery = true)
-    void deleteAllChuyenNganhByIdBoMon(@Param("id") Long id);
 }

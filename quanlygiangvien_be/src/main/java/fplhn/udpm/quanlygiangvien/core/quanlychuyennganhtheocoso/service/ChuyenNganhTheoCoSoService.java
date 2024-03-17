@@ -1,22 +1,23 @@
 package fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.service;
 
 import fplhn.udpm.quanlygiangvien.core.common.ResponseModel;
-import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.request.GetChuyenNganhRequest;
-import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.response.ChuyenNganhResponse;
-import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.request.PostChuyenNganhRequest;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.request.GetChuyenNganhTheoCoSoRequest;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.request.PutChuyenNganhTheoCoSoRequest;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.response.ChuyenNganhTheoCoSoResponse;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.request.PostChuyenNganhTheoCoSoRequest;
 import org.springframework.data.domain.Page;
 
-public interface ChuyenNganhService {
+public interface ChuyenNganhTheoCoSoService {
 
-    ChuyenNganhResponse getChuyenNganh(Long id);
+    ChuyenNganhTheoCoSoResponse getChuyenNganhTheoCoSo(Long id);
 
-    Page<ChuyenNganhResponse> getAllList(Long idBoMon, GetChuyenNganhRequest dataRequest);
+    Page<ChuyenNganhTheoCoSoResponse> getAllList(GetChuyenNganhTheoCoSoRequest dataRequest);
 
-    ResponseModel addChuyenNganh(PostChuyenNganhRequest dataRequest);
+    ResponseModel addChuyenNganhTheoCoSo(PostChuyenNganhTheoCoSoRequest dataRequest);
 
-    ResponseModel updateChuyenNganh(Long id, PostChuyenNganhRequest dataRequest);
+    ResponseModel updateChuyenNganhTheoCoSo(Long id, PutChuyenNganhTheoCoSoRequest dataRequest);
 
-    ResponseModel deleteChuyenNganh(Long id);
+    ResponseModel deleteChuyenNganhTheoCoSo(Long id);
 
 
 }

@@ -1,10 +1,11 @@
 package fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.controller;
 
 import fplhn.udpm.quanlygiangvien.core.common.ResponseModel;
-import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.request.GetChuyenNganhRequest;
-import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.request.PostChuyenNganhRequest;
-import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.response.ChuyenNganhResponse;
-import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.service.ChuyenNganhService;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.request.GetChuyenNganhTheoCoSoRequest;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.request.PostChuyenNganhTheoCoSoRequest;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.request.PutChuyenNganhTheoCoSoRequest;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.model.response.ChuyenNganhTheoCoSoResponse;
+import fplhn.udpm.quanlygiangvien.core.quanlychuyennganhtheocoso.service.ChuyenNganhTheoCoSoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,48 +16,48 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/chuyen-nganh")
+@RequestMapping("/api/chuyen-nganh-theo-co-so")
 @CrossOrigin(origins = "*")
-public class ChuyenNganhController {
+public class ChuyenNganhTheoCoSoController {
 
     @Autowired
-    private ChuyenNganhService chuyenNganhService;
+    private ChuyenNganhTheoCoSoService chuyenNganhTheoCoSoService;
 
     @GetMapping("/get/{id}")
     public ResponseEntity<?> get(@PathVariable(name = "id", required = true) Long id) {
-        ChuyenNganhResponse chuyenNganhResponse = chuyenNganhService.getChuyenNganh(id);
-        if (chuyenNganhResponse == null) {
-            return ResponseEntity.ok(new ResponseModel(HttpStatus.BAD_GATEWAY, "Bộ môn không tồn tại hoặc đã bị xoá"));
+        ChuyenNganhTheoCoSoResponse chuyenNganhTheoCoSoResponse = chuyenNganhTheoCoSoService.getChuyenNganhTheoCoSo(id);
+        if (chuyenNganhTheoCoSoResponse == null) {
+            return ResponseEntity.ok(new ResponseModel(HttpStatus.BAD_GATEWAY, "Chuyên ngành không tồn tại hoặc đã bị xoá"));
         }
-        return ResponseEntity.ok(chuyenNganhResponse);
+        return ResponseEntity.ok(chuyenNganhTheoCoSoResponse);
     }
 
-    @GetMapping("/list/{id_bo_mon}")
-    public ResponseEntity<?> list(@PathVariable(name = "id_bo_mon", required = true) Long idBoMon, @ModelAttribute GetChuyenNganhRequest dataRequest){
-        return ResponseEntity.ok(chuyenNganhService.getAllList(idBoMon, dataRequest));
+    @GetMapping("/list")
+    public ResponseEntity<?> list(@ModelAttribute GetChuyenNganhTheoCoSoRequest dataRequest){
+        return ResponseEntity.ok(chuyenNganhTheoCoSoService.getAllList(dataRequest));
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> insert(@RequestBody @Valid PostChuyenNganhRequest dataRequest, BindingResult bindingResult) {
+    public ResponseEntity<?> insert(@RequestBody @Valid PostChuyenNganhTheoCoSoRequest dataRequest, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             String message = bindingResult.getAllErrors().get(0).getDefaultMessage();
             return ResponseEntity.ok(new ResponseModel(HttpStatus.BAD_REQUEST, message));
         }
-        return ResponseEntity.ok(chuyenNganhService.addChuyenNganh(dataRequest));
+        return ResponseEntity.ok(chuyenNganhTheoCoSoService.addChuyenNganhTheoCoSo(dataRequest));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> update(@PathVariable(name = "id", required = true) Long id, @RequestBody @Valid PostChuyenNganhRequest dataRequest, BindingResult bindingResult) {
+    public ResponseEntity<?> update(@PathVariable(name = "id", required = true) Long id, @RequestBody @Valid PutChuyenNganhTheoCoSoRequest dataRequest, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             String message = bindingResult.getAllErrors().get(0).getDefaultMessage();
             return ResponseEntity.ok(new ResponseModel(HttpStatus.BAD_REQUEST, message));
         }
-        return ResponseEntity.ok(chuyenNganhService.updateChuyenNganh(id, dataRequest));
+        return ResponseEntity.ok(chuyenNganhTheoCoSoService.updateChuyenNganhTheoCoSo(id, dataRequest));
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable(name = "id", required = true) Long id) {
-        return ResponseEntity.ok(chuyenNganhService.deleteChuyenNganh(id));
+        return ResponseEntity.ok(chuyenNganhTheoCoSoService.deleteChuyenNganhTheoCoSo(id));
     }
 
 }
