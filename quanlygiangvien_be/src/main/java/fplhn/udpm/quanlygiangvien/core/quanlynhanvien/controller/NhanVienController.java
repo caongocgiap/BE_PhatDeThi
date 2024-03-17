@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/nhan_vien")
@@ -86,7 +88,7 @@ public class NhanVienController {
     }
 
     @PostMapping("/import-excel")
-    public ResponseEntity<?> importExcelNhanVien(@RequestParam("file") MultipartFile file){
+    public ResponseEntity<?> importExcelNhanVien(@RequestParam("file") MultipartFile file) throws IOException {
         ResponseModel responseModel = nhanVienService.importExcelNhanVien(file);
         return new ResponseEntity<>(responseModel.getMessage(),responseModel.getHttpStatus());
     }

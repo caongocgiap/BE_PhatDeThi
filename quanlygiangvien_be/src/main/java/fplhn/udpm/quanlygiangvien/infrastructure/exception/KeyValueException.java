@@ -13,5 +13,7 @@ import java.util.Map;
 @Getter
 @Setter
 public class KeyValueException extends RuntimeException{
+
     private Map<String,String> errors = new HashMap<>();
+
 }
