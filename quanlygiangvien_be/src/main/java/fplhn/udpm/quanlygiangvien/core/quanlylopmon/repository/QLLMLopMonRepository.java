@@ -1,5 +1,6 @@
 package fplhn.udpm.quanlygiangvien.core.quanlylopmon.repository;
 
+import fplhn.udpm.quanlygiangvien.core.quanlylopmon.model.request.PostLopMonRequest;
 import fplhn.udpm.quanlygiangvien.core.quanlylopmon.model.response.ListLopMonResponse;
 import fplhn.udpm.quanlygiangvien.core.quanlylopmon.model.response.LopMonDetailResponse;
 import fplhn.udpm.quanlygiangvien.core.quanlylopmon.model.response.LopMonResponse;
@@ -108,5 +109,22 @@ public interface QLLMLopMonRepository extends LopMonRepository {
                 WHERE lm.id = :lopMonId
                 """,nativeQuery = true)
     LopMonResponse getLopMonByLopMonId(Long lopMonId);
+
+    @Query(value = """
+                SELECT
+                	CASE
+                		WHEN COUNT(*) > 0 THEN "TRUE" ELSE "FALSE"
+                    END
+                FROM lop_mon lm
+                WHERE
+                lm.ma_lop = :#{#postLopMonRequest.maLop} AND
+                lm.phong = :#{#postLopMonRequest.phongHoc} AND
+                lm.ca = :#{#postLopMonRequest.caHoc} AND
+                lm.id_mon_hoc = :#{#postLopMonRequest.monHocId} AND
+                lm.id_block = :#{#postLopMonRequest.blockId} AND
+                lm.id_campus = :#{#postLopMonRequest.campusId} AND
+                lm.id_nhan_vien = :#{#postLopMonRequest.nhanVienId}
+                """,nativeQuery = true)
+    Boolean isLopMonExist(PostLopMonRequest postLopMonRequest);
 
 }

@@ -112,18 +112,9 @@ public class LopMonServiceImpl implements LopMonService {
         }
 
         //check duplicate
-        for (LopMon lopMonDuplicate : lopMonRepository.findAll()){
-            if( postLopMonRequest.getMaLop().equalsIgnoreCase(lopMonDuplicate.getMaLop()) &&
-                postLopMonRequest.getPhongHoc().equalsIgnoreCase(lopMonDuplicate.getPhong()) &&
-                postLopMonRequest.getCaHoc().equalsIgnoreCase(lopMonDuplicate.getCa().name()) &&
-                postLopMonRequest.getMonHocId().equals(lopMonDuplicate.getMonHoc().getId()) &&
-                postLopMonRequest.getBlockId().equals(lopMonDuplicate.getBlock().getId()) &&
-                postLopMonRequest.getCampusId().equals(lopMonDuplicate.getCampus().getId()) &&
-                postLopMonRequest.getNhanVienId().equals(lopMonDuplicate.getNhanVien().getId())
-            ){
-                errors.put("error","Đã có lớp môn này trong hệ thống!");
-                throw new KeyValueException(errors);
-            }
+        if(lopMonRepository.isLopMonExist(postLopMonRequest)){
+            errors.put("error","Đã có lớp môn này trong hệ thống!");
+            throw new KeyValueException(errors);
         }
 
         //post Lop Mon
@@ -157,6 +148,7 @@ public class LopMonServiceImpl implements LopMonService {
         if(putLopMonRequest.getPhongHoc().length() > 100){
             errors.put("error","Độ dài của phòng học phải dưới 100 kí tự!");
         }
+        //throw error
         if(!errors.isEmpty()){
             throw new KeyValueException(errors);
         }
@@ -178,27 +170,28 @@ public class LopMonServiceImpl implements LopMonService {
         if (isNhanVienExist.isEmpty()){
             errors.put("error","Nhân Viên này không tồn tại!");
         }
+        //throw error
+        if(!errors.isEmpty()){
+            throw new KeyValueException(errors);
+        }
 
         //Nếu mà giữ liệu trả về giống nó ban đầu thì sẽ không check
-        LopMon checkLopMon = lopMonRepository.getReferenceById(putLopMonRequest.getLopMonId());
-        if(!putLopMonRequest.getMaLop().equalsIgnoreCase(checkLopMon.getMaLop()) ||
-                !putLopMonRequest.getPhongHoc().equalsIgnoreCase(checkLopMon.getPhong()) ||
-                !putLopMonRequest.getCaHoc().equalsIgnoreCase(checkLopMon.getCa().name()) ||
-                !putLopMonRequest.getMonHocId().equals(checkLopMon.getMonHoc().getId()) ||
-                !putLopMonRequest.getBlockId().equals(checkLopMon.getBlock().getId()) ||
-                !putLopMonRequest.getCampusId().equals(checkLopMon.getCampus().getId()) ||
-                !putLopMonRequest.getNhanVienId().equals(checkLopMon.getNhanVien().getId())
-        ){
-            //check duplicate
-            for (LopMon lopMonDuplicate : lopMonRepository.findAll()){
-                if( putLopMonRequest.getMaLop().equalsIgnoreCase(lopMonDuplicate.getMaLop()) &&
-                        putLopMonRequest.getPhongHoc().equalsIgnoreCase(lopMonDuplicate.getPhong()) &&
-                        putLopMonRequest.getCaHoc().equalsIgnoreCase(lopMonDuplicate.getCa().name()) &&
-                        putLopMonRequest.getMonHocId().equals(lopMonDuplicate.getMonHoc().getId()) &&
-                        putLopMonRequest.getBlockId().equals(lopMonDuplicate.getBlock().getId()) &&
-                        putLopMonRequest.getCampusId().equals(lopMonDuplicate.getCampus().getId()) &&
-                        putLopMonRequest.getNhanVienId().equals(lopMonDuplicate.getNhanVien().getId())
-                ){
+        Optional<LopMon> isLopMonExist = lopMonRepository.findById(putLopMonRequest.getLopMonId());
+        if(isLopMonExist.isEmpty()){
+            errors.put("error","Không tìm thấy lớp môn này!");
+            throw new KeyValueException(errors);
+        }else{
+            LopMon checkLopMon = isLopMonExist.get();
+            if(     !putLopMonRequest.getMaLop().equalsIgnoreCase(checkLopMon.getMaLop()) ||
+                    !putLopMonRequest.getPhongHoc().equalsIgnoreCase(checkLopMon.getPhong()) ||
+                    !putLopMonRequest.getCaHoc().equalsIgnoreCase(checkLopMon.getCa().name()) ||
+                    !putLopMonRequest.getMonHocId().equals(checkLopMon.getMonHoc().getId()) ||
+                    !putLopMonRequest.getBlockId().equals(checkLopMon.getBlock().getId()) ||
+                    !putLopMonRequest.getCampusId().equals(checkLopMon.getCampus().getId()) ||
+                    !putLopMonRequest.getNhanVienId().equals(checkLopMon.getNhanVien().getId())
+            ){
+                //check duplicate
+                if(lopMonRepository.isLopMonExist(putLopMonRequest)){
                     errors.put("error","Đã có lớp môn này trong hệ thống!");
                     throw new KeyValueException(errors);
                 }
