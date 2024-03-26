@@ -13,8 +13,8 @@ import lombok.Setter;
 @Getter
 public class PostChuyenNganhRequest {
 
-    @Size(max = 255, message = "Tên bộ môn không được vượt quá 255 ký tự")
-    @NotNull(message = "Tên bộ môn không được bỏ trống")
+    @Size(max = 255, message = "Tên chuyên ngành không được vượt quá 255 ký tự")
+    @NotNull(message = "Tên chuyên ngành không được bỏ trống")
     private String ten;
 
     private Long idBoMon;

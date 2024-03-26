@@ -26,7 +26,7 @@ public class ChuyenNganhController {
     public ResponseEntity<?> get(@PathVariable(name = "id", required = true) Long id) {
         ChuyenNganhResponse chuyenNganhResponse = chuyenNganhService.getChuyenNganh(id);
         if (chuyenNganhResponse == null) {
-            return ResponseEntity.ok(new ResponseModel(HttpStatus.BAD_GATEWAY, "Bộ môn không tồn tại hoặc đã bị xoá"));
+            return ResponseEntity.ok(new ResponseModel(HttpStatus.BAD_GATEWAY, "Chuyên ngành không tồn tại hoặc đã bị xoá"));
         }
         return ResponseEntity.ok(chuyenNganhResponse);
     }

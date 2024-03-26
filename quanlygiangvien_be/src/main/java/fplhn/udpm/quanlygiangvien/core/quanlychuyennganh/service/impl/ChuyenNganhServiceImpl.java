@@ -57,10 +57,9 @@ public class ChuyenNganhServiceImpl implements ChuyenNganhService {
 
         Page<ChuyenNganhResponse> pages = dataChuyenNganhRepository.getAllChuyenNganh(idBoMon, startItem, pageable, searchName);
 
-        if (pages.getContent().isEmpty() && pages.getTotalPages() < page) {
-            page = Math.max(pages.getTotalPages(), 1);
-            startItem = (long) pages.getPageable().getPageNumber() * pages.getPageable().getPageSize();
-            pages = dataChuyenNganhRepository.getAllChuyenNganh(idBoMon, startItem, PageRequest.of(page - 1, limit), searchName);
+        if (pages.getContent().isEmpty() && pages.getTotalPages() > 0 && pages.getTotalPages() < page) {
+            dataRequest.setPage(Math.max(pages.getTotalPages(), 1));
+            return this.getAllList(idBoMon, dataRequest);
         }
 
         return new PageImpl<>(
