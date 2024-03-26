@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-public class HKCreateHocKyRequest {
+public class PostHocKyRequest {
 
     @NotNull(message = "Name cannot be blank")
     @NotBlank(message = "Name cannot be blank")
@@ -23,4 +23,5 @@ public class HKCreateHocKyRequest {
 
     @NotNull(message = "Time start cannot be blank")
     private LocalDate thoiGianBatDau;
+
 }
