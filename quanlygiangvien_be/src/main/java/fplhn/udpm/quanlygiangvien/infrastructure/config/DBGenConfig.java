@@ -42,7 +42,7 @@
 //    private CoSoRepository coSoRepository;
 //
 //    @Autowired
-//    private GiaoVienDayMonRepository giaoVienDayMonRepository;
+//    private QLGiaoVienDayMonRepository giaoVienDayMonRepository;
 //
 //    @Autowired
 //    private HocKyRepository hocKyRepository;

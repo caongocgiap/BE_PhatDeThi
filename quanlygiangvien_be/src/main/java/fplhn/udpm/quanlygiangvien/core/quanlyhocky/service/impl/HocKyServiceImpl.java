@@ -1,6 +1,6 @@
 package fplhn.udpm.quanlygiangvien.core.quanlyhocky.service.impl;
 
-import fplhn.udpm.quanlygiangvien.core.quanlyhocky.repository.DBHocKyRepository;
+import fplhn.udpm.quanlygiangvien.core.quanlyhocky.repository.QLHocKyRepository;
 import fplhn.udpm.quanlygiangvien.core.quanlyhocky.service.HocKyService;
 import fplhn.udpm.quanlygiangvien.entity.HocKy;
 import lombok.RequiredArgsConstructor;
@@ -14,21 +14,21 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class HocKyServiceImpl implements HocKyService {
 
-    private final DBHocKyRepository dbHocKyRepository;
+    private final QLHocKyRepository qlHocKyRepository;
 
     @Override
-    public Page<HocKy> getPage(Pageable pageable) {
-        return dbHocKyRepository.findAll(pageable);
+    public Page<HocKy> getPageHocKy(Pageable pageable) {
+        return qlHocKyRepository.findAll(pageable);
     }
 
     @Override
     public Optional<HocKy> getById(Long id) {
-        return dbHocKyRepository.findById(id);
+        return qlHocKyRepository.findById(id);
     }
 
     @Override
     public HocKy insert(HocKy hocKy) {
-        return dbHocKyRepository.save(hocKy);
+        return qlHocKyRepository.save(hocKy);
     }
 
     @Override
@@ -37,13 +37,13 @@ public class HocKyServiceImpl implements HocKyService {
         hocKy.setNam(hocKyUpdate.getNam());
         hocKy.setThoiGianBatDau(hocKyUpdate.getThoiGianBatDau());
         hocKy.setXoaMem(hocKyUpdate.getXoaMem());
-        return dbHocKyRepository.save(hocKy);
+        return qlHocKyRepository.save(hocKy);
     }
 
     @Override
     public boolean delete(Long id) {
         try {
-            dbHocKyRepository.deleteById(id);
+            qlHocKyRepository.deleteById(id);
             return true;
         } catch (Exception e){
             return false;

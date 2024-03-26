@@ -1,6 +1,6 @@
 package fplhn.udpm.quanlygiangvien.core.quanlyblock.model.request;
 
-import fplhn.udpm.quanlygiangvien.entity.HocKy;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,9 +13,10 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateBlockRequest {
+public class PostBlockRequest {
 
     @NotNull(message = "Name cannot be empty")
+    @NotBlank(message = "Name cannot be empty")
     private String ten;
 
     @NotNull(message = "Time start cannot be empty")
@@ -25,6 +26,6 @@ public class CreateBlockRequest {
     private LocalDate thoiGianKetThuc;
 
     @NotNull(message = "Hoc ky cannot be empty")
-    private HocKy hocKy;
+    private Long idHocKy;
 
 }

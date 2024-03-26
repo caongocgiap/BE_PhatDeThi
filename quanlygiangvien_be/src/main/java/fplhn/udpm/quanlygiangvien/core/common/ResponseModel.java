@@ -10,9 +10,17 @@ import org.springframework.http.HttpStatus;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResponseModel {
+public class ResponseModel<T> {
 
     private HttpStatus httpStatus;
 
     private String message;
+
+    private T data;
+
+    public ResponseModel(HttpStatus httpStatus, String message) {
+        this.httpStatus = httpStatus;
+        this.message = message;
+    }
+
 }

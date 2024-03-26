@@ -28,12 +28,12 @@ public class HocKyController {
 
     private final HocKyService hocKyService;
 
-    private int PAGE_SIZE = 5;
+    private int pageSize = 5;
 
     @GetMapping("/get-list/page={pageIndex}")
     public ResponseEntity<?> getAll(@PathVariable("pageIndex")Optional<Integer> pageIndex) {
-        Pageable pageable = PageRequest.of(pageIndex.orElse(0), PAGE_SIZE, Sort.by("id").descending());
-        return ResponseEntity.status(HttpStatus.OK).body(hocKyService.getPage(pageable));
+        Pageable pageable = PageRequest.of(pageIndex.orElse(0), pageSize, Sort.by("id").descending());
+        return ResponseEntity.status(HttpStatus.OK).body(hocKyService.getPageHocKy(pageable));
     }
 
     @GetMapping(value = "get/{id}")

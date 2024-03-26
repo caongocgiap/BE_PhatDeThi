@@ -1,5 +1,8 @@
 package fplhn.udpm.quanlygiangvien.core.quanlyblock.service;
 
+import fplhn.udpm.quanlygiangvien.core.common.ResponseModel;
+import fplhn.udpm.quanlygiangvien.core.quanlyblock.model.request.PostBlockRequest;
+import fplhn.udpm.quanlygiangvien.core.quanlyblock.model.request.PutBlockRequest;
 import fplhn.udpm.quanlygiangvien.entity.Block;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,11 +16,11 @@ public interface BlockService {
 
     Optional<Block> getById(Long id);
 
-    Block insert(Block newBlock);
+    ResponseModel postBlock(PostBlockRequest postBlockRequest);
 
-    Block update(Block block, Block blockUpdate);
+    ResponseModel putBlock(Long idBlock, PutBlockRequest putBlockRequest);
 
-    boolean delete(Long id);
+    ResponseModel xoaMemBlock(Long idBlock);
 
     List<Block> getBlockByHocKyId(Long id);
 

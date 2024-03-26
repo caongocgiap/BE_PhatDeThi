@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface HocKyService {
 
-    Page<HocKy> getPage(Pageable pageable);
+    Page<HocKy> getPageHocKy(Pageable pageable);
 
     Optional<HocKy> getById(Long id);
 

@@ -4,6 +4,6 @@ import fplhn.udpm.quanlygiangvien.repository.HocKyRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface DBHocKyRepository extends HocKyRepository {
+public interface QLHocKyRepository extends HocKyRepository {
 
 }
