@@ -3,17 +3,33 @@ package fplhn.udpm.quanlygiangvien.core.quanlynhanvien.service.impl;
 import fplhn.udpm.quanlygiangvien.core.common.ResponseModel;
 import fplhn.udpm.quanlygiangvien.core.quanlynhanvien.model.request.PostNhanVienRequest;
 import fplhn.udpm.quanlygiangvien.core.quanlynhanvien.model.request.PutNhanVienRequest;
-import fplhn.udpm.quanlygiangvien.core.quanlynhanvien.model.response.*;
-import fplhn.udpm.quanlygiangvien.core.quanlynhanvien.repository.*;
+import fplhn.udpm.quanlygiangvien.core.quanlynhanvien.model.response.GetAllBoMonTheoCoSoByCoSoIdResponse;
+import fplhn.udpm.quanlygiangvien.core.quanlynhanvien.model.response.GetAllChucVuByCoSoIdResponse;
+import fplhn.udpm.quanlygiangvien.core.quanlynhanvien.model.response.GetAllHocKyResponse;
+import fplhn.udpm.quanlygiangvien.core.quanlynhanvien.model.response.GetAllNhanVienChucVuResponse;
+import fplhn.udpm.quanlygiangvien.core.quanlynhanvien.model.response.GetDetailNhanVienChucVuResponse;
+import fplhn.udpm.quanlygiangvien.core.quanlynhanvien.model.response.GetNhanVienChucVuByIdResponse;
+import fplhn.udpm.quanlygiangvien.core.quanlynhanvien.repository.QLNVBoMonRepository;
+import fplhn.udpm.quanlygiangvien.core.quanlynhanvien.repository.QLNVBoMonTheoCoSoRepository;
+import fplhn.udpm.quanlygiangvien.core.quanlynhanvien.repository.QLNVChucVuRepository;
+import fplhn.udpm.quanlygiangvien.core.quanlynhanvien.repository.QLNVCoSoRepository;
+import fplhn.udpm.quanlygiangvien.core.quanlynhanvien.repository.QLNVHocKyRepository;
+import fplhn.udpm.quanlygiangvien.core.quanlynhanvien.repository.QLNVNhanVienChucVuRepository;
+import fplhn.udpm.quanlygiangvien.core.quanlynhanvien.repository.QLNVNhanVienRepository;
 import fplhn.udpm.quanlygiangvien.core.quanlynhanvien.service.NhanVienService;
-import fplhn.udpm.quanlygiangvien.entity.*;
+import fplhn.udpm.quanlygiangvien.core.quanlynhanvien.utils.CheckValid;
+import fplhn.udpm.quanlygiangvien.entity.BoMon;
+import fplhn.udpm.quanlygiangvien.entity.BoMonTheoCoSo;
+import fplhn.udpm.quanlygiangvien.entity.ChucVu;
+import fplhn.udpm.quanlygiangvien.entity.CoSo;
+import fplhn.udpm.quanlygiangvien.entity.HocKy;
+import fplhn.udpm.quanlygiangvien.entity.NhanVien;
+import fplhn.udpm.quanlygiangvien.entity.NhanVienChucVu;
 import fplhn.udpm.quanlygiangvien.infrastructure.constant.LoaiHopDong;
 import fplhn.udpm.quanlygiangvien.infrastructure.constant.TenHocKy;
 import fplhn.udpm.quanlygiangvien.infrastructure.constant.TrangThaiNhanVien;
 import fplhn.udpm.quanlygiangvien.infrastructure.constant.XoaMem;
 import fplhn.udpm.quanlygiangvien.infrastructure.exception.KeyValueException;
-import fplhn.udpm.quanlygiangvien.core.quanlynhanvien.utils.CheckValid;
-import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -28,7 +44,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class NhanVienServiceImpl implements NhanVienService {
@@ -326,7 +346,25 @@ public class NhanVienServiceImpl implements NhanVienService {
     }
 
     @Override
-    public ResponseModel importExcelNhanVien(MultipartFile file) {
+    public ResponseModel importExcelNhanVien(MultipartFile file) throws IOException {
+        Map<String,String> error = new HashMap<>();
+        String[] fileNameSplit = file.getOriginalFilename().split("\\.");
+        if(!fileNameSplit[1].equalsIgnoreCase("xlsx")){
+            error.put("excel","File Bạn Chọn Không Phải Là File Excel!");
+        }
+        //throw error
+        if (!error.isEmpty()){
+            throw new KeyValueException(error);
+        }
+        //check Size
+        if(file.getSize() > 10 * 1024 * 1024){
+            error.put("excel","Dung Lượng File Không Được Lớn Hơn 10MB!");
+        }
+        //throw error
+        if (!error.isEmpty()){
+            throw new KeyValueException(error);
+        }
+
         try{
             Workbook workbook = new XSSFWorkbook(file.getInputStream());
             Sheet sheet = workbook.getSheetAt(0);
@@ -430,7 +468,6 @@ public class NhanVienServiceImpl implements NhanVienService {
                 }
             }
         }catch (IOException e){
-            Map<String,String> error = new HashMap<>();
             error.put("error","Đã sảy ra một vài lỗi nhỏ!");
             throw new KeyValueException(error);
         }

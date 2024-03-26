@@ -15,7 +15,7 @@ public interface QLNVBoMonTheoCoSoRepository extends BoMonTheoCoSoRepository {
     @Query(value = """
             SELECT  bmtcs.id AS id,
                     bm.ten AS name
-            FROM bo_mon_theo_co_so bmtcs JOIN bo_mon bm ON bmtcs.id_co_so = bm.id
+            FROM bo_mon_theo_co_so bmtcs JOIN bo_mon bm ON bmtcs.id_bo_mon = bm.id
             WHERE bmtcs.id_co_so = :coSoId AND bmtcs.xoa_mem = "CHUA_XOA"
             """,nativeQuery = true)
     List<GetAllBoMonTheoCoSoByCoSoIdResponse> getAllBoMonTheoCoSo_ByCoSoId(Long coSoId);
