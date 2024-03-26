@@ -17,14 +17,16 @@ import java.time.LocalDate;
 public class LopMon extends BaseEntity {
 
     @Column(name = "ma_lop", length = 255, nullable = true)
-    @Nationalized
     private String maLop;
+
+    @Column(name = "phong", length = 255, nullable = true)
+    private String phong;
 
     @Column(name = "ngay")
     private LocalDate ngay;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "ca")
+    @Enumerated(EnumType.STRING)
     private Ca ca;
 
     @ManyToOne
@@ -42,4 +44,5 @@ public class LopMon extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "id_nhan_vien")
     private NhanVien nhanVien;
+
 }
