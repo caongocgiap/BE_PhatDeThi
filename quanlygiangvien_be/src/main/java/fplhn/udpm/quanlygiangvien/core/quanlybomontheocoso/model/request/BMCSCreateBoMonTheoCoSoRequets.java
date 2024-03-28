@@ -18,6 +18,6 @@ public class BMCSCreateBoMonTheoCoSoRequets {
     @NotNull(message = "Bộ Môn không được để trống")
     private Long idBoMon;
 
-    @NotNull(message = "Trưởng bộ môn không được để trống")
+//    @NotNull(message = "Trưởng bộ môn không được để trống")
     private Long idTruongBoMon;
 }

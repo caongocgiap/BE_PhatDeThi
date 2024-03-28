@@ -43,7 +43,9 @@ public class BMCSBoMonTheoCoSoServiceImpl implements BMCSBoMonTheoCoSoService {
     public PageBoMonTheoCoSoResponse paginateAndSearch(BMCSFindBoMonTheoCoSoRequest bmcsFindBoMonTheoCoSoRequest) {
         Pageable pageable = PageRequest.of(bmcsFindBoMonTheoCoSoRequest.getPageNo()-1,bmcsFindBoMonTheoCoSoRequest.getPageSize());
 
-        Page<BMCSBoMonTheoCoSoResponse> coSoPage = bmcsBoMonTheoCoSoRepository.paginateAndSearch(pageable,bmcsFindBoMonTheoCoSoRequest.getIdCoSo(), bmcsFindBoMonTheoCoSoRequest.getTenBoMon());
+        Long start = bmcsFindBoMonTheoCoSoRequest.getPageSize()*(bmcsFindBoMonTheoCoSoRequest.getPageNo())*1L;
+
+        Page<BMCSBoMonTheoCoSoResponse> coSoPage = bmcsBoMonTheoCoSoRepository.paginateAndSearch(pageable,bmcsFindBoMonTheoCoSoRequest.getIdCoSo(), bmcsFindBoMonTheoCoSoRequest.getTenBoMon(),start);
 
         // Lấy danh sách sản phẩm từ trang kết quả
         List<BMCSBoMonTheoCoSoResponse> listOfProduct = coSoPage.getContent();
@@ -56,6 +58,7 @@ public class BMCSBoMonTheoCoSoServiceImpl implements BMCSBoMonTheoCoSoService {
     @Override
     public ResponseModel addBoMonTheoCoSo(BMCSCreateBoMonTheoCoSoRequets bmcsCreateBoMonTheoCoSoRequets) {
         Optional<CoSo> coSoOptional = csCoSoRepository.findById(bmcsCreateBoMonTheoCoSoRequets.getIdCoSo());
+        BoMonTheoCoSo boMonTheoCoSo = new BoMonTheoCoSo();
         if(!coSoOptional.isPresent()){
             return new ResponseModel(HttpStatus.NOT_ACCEPTABLE,"Cơ sở không tồn tại");
         }
@@ -63,17 +66,15 @@ public class BMCSBoMonTheoCoSoServiceImpl implements BMCSBoMonTheoCoSoService {
         if(!boMonOptional.isPresent()){
             return new ResponseModel(HttpStatus.NOT_ACCEPTABLE,"Bộ môn không tồn tại");
         }
-        Optional<NhanVien> nhanVienOptional = nhanVienRepository.findById(bmcsCreateBoMonTheoCoSoRequets.getIdTruongBoMon());
-        if(!nhanVienOptional.isPresent()){
-            return new ResponseModel(HttpStatus.NOT_ACCEPTABLE,"Trưởng bộ môn không tồn tại");
+        if((bmcsCreateBoMonTheoCoSoRequets.getIdTruongBoMon()!=null) && (bmcsCreateBoMonTheoCoSoRequets.getIdTruongBoMon()!=0)){
+            Optional<NhanVien> nhanVienOptional = nhanVienRepository.findById(bmcsCreateBoMonTheoCoSoRequets.getIdTruongBoMon());
+            boMonTheoCoSo.setNhanVien(nhanVienOptional.get());
         }
         if(bmcsBoMonTheoCoSoRepository.existsByBoMonAndCoSo(boMonOptional.get(),coSoOptional.get())){
             return new ResponseModel(HttpStatus.NOT_ACCEPTABLE,"Bộ môn đã tồn tại ở cơ sở này");
         }
-        BoMonTheoCoSo boMonTheoCoSo = new BoMonTheoCoSo();
         boMonTheoCoSo.setBoMon(boMonOptional.get());
         boMonTheoCoSo.setCoSo(coSoOptional.get());
-        boMonTheoCoSo.setNhanVien(nhanVienOptional.get());
         boMonTheoCoSo.setXoaMem(XoaMem.CHUA_XOA);
         bmcsBoMonTheoCoSoRepository.save(boMonTheoCoSo);
         return new ResponseModel(HttpStatus.CREATED,"Thêm thành công");

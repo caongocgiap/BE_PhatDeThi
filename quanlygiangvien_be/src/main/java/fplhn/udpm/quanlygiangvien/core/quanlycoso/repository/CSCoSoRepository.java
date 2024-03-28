@@ -15,10 +15,11 @@ import java.util.Set;
 @Repository
 public interface CSCoSoRepository extends CoSoRepository {
 
-    @Query(value = "SELECT id as idCoSo, ten as tenCoSo, xoa_mem as xoaMemCoSo" +
+    @Query(value = "SELECT (@row_number \\:= @row_number + 1) AS stt, id AS idCoSo, ten AS tenCoSo, xoa_mem AS xoaMemCoSo" +
             " FROM co_so cs" +
-            " WHERE  cs.id IN :searchTermList", nativeQuery = true)
-    Page<CSCoSoResponse> paginateAndSearch(Pageable pageable, @Param("searchTermList")Set<String> lisTenCoSo);
+            " JOIN (SELECT @row_number \\:= :start) AS init" +
+            " WHERE cs.id IN :searchTermList ORDER BY cs.id DESC", nativeQuery = true)
+    Page<CSCoSoResponse> paginateAndSearch(Pageable pageable, @Param("searchTermList")Set<String> lisTenCoSo,@Param("start")Long start);
 
     @Query(value = "SELECT id as idCoSo, ten as tenCoSo, xoa_mem as xoaMemCoSo " +
             "FROM co_so ", nativeQuery = true)

@@ -38,8 +38,8 @@ public class CSCoSoServiceImpl implements CSCoSoService {
         }
         if(list.isEmpty()) list.addAll(csCoSoRepository.searchName(""));
 
-
-        Page<CSCoSoResponse> coSoPage = csCoSoRepository.paginateAndSearch(pageable,list);
+        Long start = csFindCoSoRequest.getPageSize()*(csFindCoSoRequest.getPageNo()-1)*1L;
+        Page<CSCoSoResponse> coSoPage = csCoSoRepository.paginateAndSearch(pageable,list,start);
 
         // Lấy danh sách sản phẩm từ trang kết quả
         List<CSCoSoResponse> listOfProduct = coSoPage.getContent();
