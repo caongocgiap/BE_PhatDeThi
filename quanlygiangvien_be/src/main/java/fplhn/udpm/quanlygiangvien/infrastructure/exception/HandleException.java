@@ -31,4 +31,10 @@ public class HandleException {
     public ResponseEntity<?> messageExceptionHandler(MessageException messageException){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(messageException.getMessage());
     }
+
+    @ExceptionHandler(KeyValueException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<?> keyValueExceptionHandler(KeyValueException keyValueException){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(keyValueException.getErrors());
+    }
 }
