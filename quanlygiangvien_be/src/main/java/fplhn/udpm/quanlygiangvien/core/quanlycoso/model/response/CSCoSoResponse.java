@@ -7,6 +7,8 @@ import lombok.Setter;
 
 public interface CSCoSoResponse {
 
+    Long getStt();
+
     Long getIdCoSo();
 
     String getXoaMemCoSo();
