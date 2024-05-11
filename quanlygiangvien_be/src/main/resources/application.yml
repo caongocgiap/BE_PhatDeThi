@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/poly_factory_qlgv
-    username: root
-    password: Trang2566526
+    url: jdbc:mysql://localhost:3306/quan_ly_giang_vien
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
   servlet:
     multipart:
       enabled: true

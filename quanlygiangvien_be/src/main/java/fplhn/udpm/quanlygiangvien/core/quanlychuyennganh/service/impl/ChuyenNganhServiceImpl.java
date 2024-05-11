@@ -144,37 +144,19 @@ public class ChuyenNganhServiceImpl implements ChuyenNganhService {
     @Override
     public ResponseModel deleteChuyenNganh(Long id) {
 
-        Optional<ChuyenNganhResponse> currentChuyenNganh = dataChuyenNganhRepository.getChuyenNganhById(id);
+        Optional<ChuyenNganh> currentChuyenNganh = dataChuyenNganhRepository.findById(id);
 
         if (currentChuyenNganh.isEmpty()) {
-            return new ResponseModel(HttpStatus.BAD_GATEWAY, "Chuyên ngành không tồn tại hoặc đã bị xoá");
+            return new ResponseModel(HttpStatus.BAD_GATEWAY, "Chuyên ngành không tồn tại!");
         }
 
-        BoMon boMon = new BoMon();
-        boMon.setId(currentChuyenNganh.get().getIdBoMon());
-
-        ChuyenNganh chuyenNganh = new ChuyenNganh();
-        chuyenNganh.setId(currentChuyenNganh.get().getId());
-        chuyenNganh.setTen(currentChuyenNganh.get().getTen());
-        chuyenNganh.setBoMon(boMon);
-        chuyenNganh.setXoaMem(XoaMem.DA_XOA);
-
-        if (currentChuyenNganh.get().getTrangThai().equals(XoaMem.CHUA_XOA)) {
-            try {
-                dataChuyenNganhRepository.save(chuyenNganh);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return new ResponseModel(HttpStatus.BAD_GATEWAY, "Có lỗi xảy ra. Vui lòng thử lại");
-            }
-            return new ResponseModel(HttpStatus.OK, "Cập nhật thành công chuyên ngành: " + currentChuyenNganh.get().getTen());
+        if(currentChuyenNganh.get().getXoaMem().equals(XoaMem.CHUA_XOA)){
+            currentChuyenNganh.get().setXoaMem(XoaMem.DA_XOA);
+        }else{
+            currentChuyenNganh.get().setXoaMem(XoaMem.CHUA_XOA);
         }
 
-        try {
-            dataChuyenNganhRepository.delete(chuyenNganh);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseModel(HttpStatus.BAD_GATEWAY, "Có lỗi xảy ra. Vui lòng thử lại");
-        }
+        dataChuyenNganhRepository.save(currentChuyenNganh.get());
 
         return new ResponseModel(HttpStatus.OK, "Xoá thành công chuyên ngành: " + currentChuyenNganh.get().getTen());
     }

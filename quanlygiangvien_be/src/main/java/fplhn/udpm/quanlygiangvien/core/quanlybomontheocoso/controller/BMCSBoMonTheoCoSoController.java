@@ -20,8 +20,6 @@ public class BMCSBoMonTheoCoSoController {
 
     @GetMapping
     public PageBoMonTheoCoSoResponse pageandSearch(BMCSFindBoMonTheoCoSoRequest bmcsFindBoMonTheoCoSoRequest){
-        System.out.println(bmcsFindBoMonTheoCoSoRequest.getIdCoSo());
-        System.out.println(bmcsFindBoMonTheoCoSoRequest.getTenBoMon());
         return bmcsBoMonTheoCoSoService.paginateAndSearch(bmcsFindBoMonTheoCoSoRequest);
     }
 

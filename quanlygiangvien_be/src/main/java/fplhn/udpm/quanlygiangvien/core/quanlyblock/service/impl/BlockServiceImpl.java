@@ -48,7 +48,7 @@ public class BlockServiceImpl implements BlockService {
 
         Optional<HocKy> isHocKyExists = qlHocKyRepository.findById(postBlockRequest.getIdHocKy());
         if(isHocKyExists.isEmpty()) {
-            errors.put("hocKy", "Hoc ky does not exists!");
+            errors.put("hocKy", "Học kỳ không tồn tại!");
         }
         if(!errors.isEmpty()) {
             throw new KeyValueException(errors);

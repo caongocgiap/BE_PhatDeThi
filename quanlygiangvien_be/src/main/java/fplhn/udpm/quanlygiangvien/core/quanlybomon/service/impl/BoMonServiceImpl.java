@@ -128,37 +128,21 @@ public class BoMonServiceImpl implements BoMonService {
     @Override
     public ResponseModel deleteBoMon(Long id) {
 
-        Optional<BoMonResponse> currentBoMon = dataBoMonRepository.getBoMonById(id);
+        Optional<BoMon> currentBoMon = dataBoMonRepository.findById(id);
 
         if (currentBoMon.isEmpty()) {
             return new ResponseModel(HttpStatus.BAD_GATEWAY, "Bộ môn không tồn tại hoặc đã bị xoá");
         }
 
-        BoMon boMon = new BoMon();
-        boMon.setId(currentBoMon.get().getId());
-        boMon.setTen(currentBoMon.get().getTen());
-        boMon.setXoaMem(XoaMem.DA_XOA);
-
-        if (currentBoMon.get().getTrangThai().equals(XoaMem.CHUA_XOA)) {
-            try {
-                dataBoMonRepository.save(boMon);
-                dataChuyenNganhRepository.updateXoaMemAllChuyenNganhByIdBoMon(boMon.getId());
-            } catch (Exception e) {
-                e.printStackTrace();
-                return new ResponseModel(HttpStatus.BAD_GATEWAY, "Có lỗi xảy ra. Vui lòng thử lại");
-            }
-            return new ResponseModel(HttpStatus.OK, "Cập nhật thành công bộ môn: " + currentBoMon.get().getTen());
+        if(currentBoMon.get().getXoaMem().equals(XoaMem.CHUA_XOA)){
+            currentBoMon.get().setXoaMem(XoaMem.DA_XOA);
+        }else{
+            currentBoMon.get().setXoaMem(XoaMem.CHUA_XOA);
         }
 
-        try {
-            dataChuyenNganhRepository.deleteAllChuyenNganhByIdBoMon(boMon.getId());
-            dataBoMonRepository.delete(boMon);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseModel(HttpStatus.BAD_GATEWAY, "Có lỗi xảy ra. Vui lòng thử lại");
-        }
+        dataBoMonRepository.save(currentBoMon.get());
 
-        return new ResponseModel(HttpStatus.OK, "Xoá thành công bộ môn: " + currentBoMon.get().getTen());
+        return new ResponseModel(HttpStatus.OK, "Thay đổi thành công trạng thái Bộ Môn: " + currentBoMon.get().getTen());
     }
 
 }

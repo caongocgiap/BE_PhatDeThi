@@ -15,17 +15,16 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class PostBlockRequest {
 
-    @NotNull(message = "Name cannot be empty")
-    @NotBlank(message = "Name cannot be empty")
+    @NotBlank(message = "Tên không được trống!")
     private String ten;
 
-    @NotNull(message = "Time start cannot be empty")
+    @NotNull(message = "Thời gian bắt đầu không được trống!")
     private LocalDate thoiGianBatDau;
 
-    @NotNull(message = "Time finished cannot be empty")
+    @NotNull(message = "Thời gian kết thúc không được trống!")
     private LocalDate thoiGianKetThuc;
 
-    @NotNull(message = "Hoc ky cannot be empty")
+    @NotNull(message = "Học kỳ không được trống!")
     private Long idHocKy;
 
 }

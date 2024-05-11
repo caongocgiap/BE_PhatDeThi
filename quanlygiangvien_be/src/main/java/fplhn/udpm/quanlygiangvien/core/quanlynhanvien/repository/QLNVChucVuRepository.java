@@ -16,7 +16,8 @@ public interface QLNVChucVuRepository extends ChucVuRepository {
                 SELECT  cv.id AS id,
                         cv.ten AS name
                 FROM chuc_vu cv
-                WHERE cv.id_co_so = :coSoId AND xoa_mem = "CHUA_XOA"
+                WHERE cv.id_co_so = :coSoId
+                AND xoa_mem = "CHUA_XOA"
                 """,nativeQuery = true)
     List<GetAllChucVuByCoSoIdResponse> getAllChucVu_ByCoSoId(Long coSoId);
 
