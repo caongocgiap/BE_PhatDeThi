@@ -3,6 +3,7 @@ package fplhn.udpm.quanlygiangvien.core.quanlyhocky.controller;
 import fplhn.udpm.quanlygiangvien.core.quanlyhocky.service.HocKyService;
 import fplhn.udpm.quanlygiangvien.entity.HocKy;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -32,8 +33,9 @@ public class HocKyController {
 
     @GetMapping("/get-list/page={pageIndex}")
     public ResponseEntity<?> getAll(@PathVariable("pageIndex")Optional<Integer> pageIndex) {
-        Pageable pageable = PageRequest.of(pageIndex.orElse(0), pageSize, Sort.by("id").descending());
-        return ResponseEntity.status(HttpStatus.OK).body(hocKyService.getPageHocKy(pageable));
+        Pageable pageable = PageRequest.of(pageIndex.orElse(0), pageSize, Sort.by("thoiGianBatDau").descending());
+        Page<HocKy> hocKyPage = hocKyService.getPageHocKy(pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(hocKyPage);
     }
 
     @GetMapping(value = "get/{id}")

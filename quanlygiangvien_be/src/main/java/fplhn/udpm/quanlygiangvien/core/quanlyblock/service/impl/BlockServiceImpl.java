@@ -114,7 +114,11 @@ public class BlockServiceImpl implements BlockService {
 
     @Override
     public List<Block> getBlockByHocKyId(Long id) {
-        return qlBlockRepository.selectBlockByIdHocKy(id);
+        List<Block> block = qlBlockRepository.selectBlockByIdHocKy(id); //<-->
+        System.out.println(block.get(0).getThoiGianBatDau());
+        System.out.println(block.get(0).getThoiGianKetThuc());
+//        System.out.println(block.get(1).getThoiGianBatDau());
+        return block;
     }
 
 }
