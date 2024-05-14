@@ -37,6 +37,7 @@ public class BlockController {
 
     @GetMapping("/get-block-by-id-hoc-ky/{id}")
     public ResponseEntity<?> getByIdHocKy(@PathVariable("id") Long id) {
+        System.out.println(id);
         return ResponseEntity.status(HttpStatus.OK).body(blockService.getBlockByHocKyId(id));
     }
 
